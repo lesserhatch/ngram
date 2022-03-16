@@ -28,22 +28,6 @@ defmodule NgramWeb.PlayLive do
   end
 
   @impl true
-  def handle_event(
-        "move",
-        %{"square" => square},
-        %{assigns: %{game_code: code, player: player}} = socket
-      ) do
-    case GameServer.move(code, player.id, String.to_existing_atom(square)) do
-      :ok ->
-        # We get the new official game state through a PubSub event
-        {:noreply, socket}
-
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, reason)}
-    end
-  end
-
-  @impl true
   def handle_event("restart", _params, %{assigns: %{game_code: code}} = socket) do
     case GameServer.restart(code) do
       :ok ->
