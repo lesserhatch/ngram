@@ -10,6 +10,14 @@
       Tell a friend to use this game code to join you!
     </p>
   <% else %>
+
+    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
+      <%= @game.ngram %>
+    </div>
+    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
+      <%= @game.hint %>
+    </div>
+
     <%= if @player do %>
       <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
         Player: <span class="font-semibold"><%= @player.name %></span>

@@ -27,7 +27,10 @@ defmodule Ngram.GameState do
               Square.build(:sq31),
               Square.build(:sq32),
               Square.build(:sq33)
-            ]
+            ],
+            ngram: "",
+            guessed_letters: [],
+            hint: ""
 
   @type game_code :: String.t()
 
@@ -43,13 +46,32 @@ defmodule Ngram.GameState do
   # 30 Minutes of inactivity ends the game
   @inactivity_timeout 1000 * 60 * 30
 
+  @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+
   @doc """
   Return an initialized GameState struct. Requires one player to start.
   """
   @spec new(game_code(), Player.t()) :: t()
   def new(game_code, %Player{} = player) do
-    %GameState{code: game_code, players: [%Player{player | letter: "O"}]}
+    %GameState{code: game_code, players: [%Player{player | letter: "O"}], ngram: "a beautiful day in the neighborhood"}
     |> reset_inactivity_timer()
+    |> get_hint()
+  end
+
+  @doc """
+  Guess letter
+  """
+  def guess_letter(%GameState{} = state, %Player{} = _player, letter) do
+    # TODO: Handle case where letter == vowel
+    # TODO: Handle case where letter is already guessed
+    %{ state | guessed_letters: [letter | state.guessed_letters] }
+    |> get_hint()
+    # TODO: Handle case where ngram is solved
+    # TODO: Next player
+  end
+
+  def get_hint(%GameState{} = state) do
+    %{state | hint: String.replace(state.ngram, @alphabet -- state.guessed_letters, "_") }
   end
 
   @doc """
