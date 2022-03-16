@@ -1,8 +1,8 @@
-defmodule Tictac.Fixtures do
+defmodule Ngram.Fixtures do
   @moduledoc """
   This module defines test helpers for creating entities.
   """
-  alias Tictac.Player
+  alias Ngram.Player
 
   @spec fixture(type :: atom(), attrs :: map()) :: struct()
   def fixture(type, attrs \\ %{})

@@ -1,4 +1,4 @@
-# Tictac
+# Ngram
 
 This is a demonstration of building a clustered, distributed, multi-player, turn-based game server written in Elixir. As designed, it plays Tic-Tac-Toe, but was designed to be extended to play almost any multi-player turn based game.
 
@@ -140,10 +140,10 @@ fly status
 fly logs
 
 2021-03-31T14:28:22.880Z c9b72c04 sea [info] [info] [libcluster:fly6pn] connected to :"tictac@fdaa:0:1da8:a7b:ab3:1c48:eb59:2"
-2021-03-31T14:28:22.881Z c9b72c04 sea [info] [info] Starting Horde.RegistryImpl with name Tictac.GameRegistry
-2021-03-31T14:28:22.884Z c9b72c04 sea [info] [info] Starting Horde.DynamicSupervisorImpl with name Tictac.DistributedSupervisor
-2021-03-31T14:28:22.890Z c9b72c04 sea [info] [info] Running TictacWeb.Endpoint with cowboy 2.8.0 at :::4000 (http)
-2021-03-31T14:28:22.892Z c9b72c04 sea [info] [info] Access TictacWeb.Endpoint at https://tictac.fly.dev
+2021-03-31T14:28:22.881Z c9b72c04 sea [info] [info] Starting Horde.RegistryImpl with name Ngram.GameRegistry
+2021-03-31T14:28:22.884Z c9b72c04 sea [info] [info] Starting Horde.DynamicSupervisorImpl with name Ngram.DistributedSupervisor
+2021-03-31T14:28:22.890Z c9b72c04 sea [info] [info] Running NgramWeb.Endpoint with cowboy 2.8.0 at :::4000 (http)
+2021-03-31T14:28:22.892Z c9b72c04 sea [info] [info] Access NgramWeb.Endpoint at https://tictac.fly.dev
 ```
 
 The first log line shows the nodes are connected.

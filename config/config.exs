@@ -8,11 +8,11 @@
 use Mix.Config
 
 # Configures the endpoint
-config :tictac, TictacWeb.Endpoint,
+config :tictac, NgramWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "/03gdZfIExh2op5Xzm1A0YuYp5VlP4nGDUbX6yc2TpR3MY/K/LCk8h2mLjF9PXEC",
-  render_errors: [view: TictacWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Tictac.PubSub,
+  render_errors: [view: NgramWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Ngram.PubSub,
   live_view: [signing_salt: "wxN4jnnC"]
 
 # Track which mix environment this is for since Mix isn't available in

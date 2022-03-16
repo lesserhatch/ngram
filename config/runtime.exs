@@ -12,7 +12,7 @@ if config_env() == :prod do
     System.get_env("FLY_APP_NAME") ||
       raise "FLY_APP_NAME not available"
 
-  config :tictac, TictacWeb.Endpoint,
+  config :tictac, NgramWeb.Endpoint,
     server: true,
     url: [host: "#{app_name}.fly.dev", port: 80],
     http: [

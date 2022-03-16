@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :tictac, TictacWeb.Endpoint,
+config :tictac, NgramWeb.Endpoint,
   http: [port: System.get_env("PORT", "4000")],
   debug_errors: true,
   code_reloader: true,
@@ -46,13 +46,13 @@ config :tictac, TictacWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :tictac, TictacWeb.Endpoint,
+config :tictac, NgramWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/tictac_web/(live|views)/.*(ex)$",
-      ~r"lib/tictac_web/templates/.*(eex)$"
+      ~r"lib/ngram_web/(live|views)/.*(ex)$",
+      ~r"lib/ngram_web/templates/.*(eex)$"
     ]
   ]
 

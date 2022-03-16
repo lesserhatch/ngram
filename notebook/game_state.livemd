@@ -2,34 +2,34 @@
 
 ## Explanation
 
-The heart of the Tictac app is the `%Tictac.GameState{}` struct and module.
-It defines the data structure and the functions for manipulating the game state. 
+The heart of the Ngram app is the `%Ngram.GameState{}` struct and module.
+It defines the data structure and the functions for manipulating the game state.
 The struct is used by a GenServer to model and manage state changes to a running game.
 
-When a game is created, it is given a name or code to identify it. A game is created 
-by a player, so it starts with one initial player. Before the game can start, a 
+When a game is created, it is given a name or code to identify it. A game is created
+by a player, so it starts with one initial player. Before the game can start, a
 second player must join.
 
-This walks through a game setup, showing behavior with game moves, how the states 
+This walks through a game setup, showing behavior with game moves, how the states
 change, and finally when a game ends.
 
 ## Setup
 
 Create the players and setup the GameState.
 
-Start by first creating two players that we'll use to create a game and have the 2nd 
+Start by first creating two players that we'll use to create a game and have the 2nd
 player join the game.
 
 ```elixir
-{:ok, player_1} = Tictac.Player.create(%{name: "Tom"})
-{:ok, player_2} = Tictac.Player.create(%{name: "John"})
+{:ok, player_1} = Ngram.Player.create(%{name: "Tom"})
+{:ok, player_2} = Ngram.Player.create(%{name: "John"})
 nil
 ```
 
 When a player is created, they don't yet have a "letter" assigned. That get's assigned once they've joined the game.
 
 ```elixir
-alias Tictac.GameState
+alias Ngram.GameState
 game = GameState.new("ABCD", player_1)
 ```
 
@@ -39,7 +39,7 @@ Once a game is created, the status is `:not_started`. It's waiting for another p
 game.status
 ```
 
-When the 2nd player joins, we still are in a `:not_started` state until the game is 
+When the 2nd player joins, we still are in a `:not_started` state until the game is
 explicitly started.
 
 ```elixir

@@ -1,4 +1,4 @@
-defmodule TictacWeb.ConnCase do
+defmodule NgramWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule TictacWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use TictacWeb.ConnCase, async: true`, although
+  by setting `use NgramWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -22,12 +22,12 @@ defmodule TictacWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import TictacWeb.ConnCase
+      import NgramWeb.ConnCase
 
-      alias TictacWeb.Router.Helpers, as: Routes
+      alias NgramWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
-      @endpoint TictacWeb.Endpoint
+      @endpoint NgramWeb.Endpoint
     end
   end
 

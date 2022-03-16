@@ -1,4 +1,4 @@
-defmodule Tictac.MixProject do
+defmodule Ngram.MixProject do
   use Mix.Project
 
   def project do
@@ -19,7 +19,7 @@ defmodule Tictac.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Tictac.Application, []},
+      mod: {Ngram.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
