@@ -64,10 +64,12 @@ defmodule Ngram.GameState do
   def guess_letter(%GameState{} = state, %Player{} = _player, letter) do
     # TODO: Handle case where letter == vowel
     # TODO: Handle case where letter is already guessed
-    %{ state | guessed_letters: [letter | state.guessed_letters] }
+    state = %{ state | guessed_letters: [letter | state.guessed_letters] }
     |> get_hint()
     # TODO: Handle case where ngram is solved
     # TODO: Next player
+
+    {:ok, state}
   end
 
   def get_hint(%GameState{} = state) do

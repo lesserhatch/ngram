@@ -17,6 +17,9 @@
     <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
       <%= @game.hint %>
     </div>
+    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center" phx-window-keydown="guess">
+      Guess: <%= @guess %>
+    </div>
 
     <%= if @player do %>
       <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">

@@ -19,12 +19,34 @@ defmodule NgramWeb.PlayLive do
        player_id: player_id,
        player: nil,
        game: %GameState{},
+       guess: "",
        server_found: GameServer.server_found?(game_code)
      )}
   end
 
   def mount(_params, _session, socket) do
     {:ok, push_redirect(socket, to: Routes.page_path(socket, :index))}
+  end
+
+  @impl true
+  def handle_event("guess", %{"key" => "Enter"}, socket) do
+    case GameServer.guess_letter(
+      socket.assigns.game_code,
+      socket.assigns.player_id,
+      socket.assigns.guess
+    ) do
+      :ok ->
+        # We get the new official game state through a PubSub event
+        {:noreply, socket}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, reason)}
+    end
+  end
+
+  @impl true
+  def handle_event("guess", %{"key" => key}, socket) do
+    {:noreply, assign(socket, guess: key)}
   end
 
   @impl true
