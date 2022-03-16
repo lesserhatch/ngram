@@ -55,24 +55,26 @@ defmodule Ngram.GameState do
   def new(game_code, %Player{} = player) do
     %GameState{code: game_code, players: [%Player{player | letter: "O"}], ngram: "a beautiful day in the neighborhood"}
     |> reset_inactivity_timer()
-    |> get_hint()
+    |> update_hint()
   end
 
   @doc """
   Guess letter
   """
-  def guess_letter(%GameState{} = state, %Player{} = _player, letter) do
+  def guess_letter(%GameState{} = state, %Player{} = player, letter) do
     # TODO: Handle case where letter == vowel
     # TODO: Handle case where letter is already guessed
     state = %{ state | guessed_letters: [letter | state.guessed_letters] }
-    |> get_hint()
-    # TODO: Handle case where ngram is solved
-    # TODO: Next player
 
-    {:ok, state}
+    state
+    |> update_hint()
+    |> verify_player_turn(player)
+    |> check_for_done()
+    |> next_player_turn()
+    |> reset_inactivity_timer()
   end
 
-  def get_hint(%GameState{} = state) do
+  def update_hint(%GameState{} = state) do
     %{state | hint: String.replace(state.ngram, @alphabet -- state.guessed_letters, "_") }
   end
 
