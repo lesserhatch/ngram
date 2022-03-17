@@ -11,7 +11,7 @@ defmodule Ngram.GameState do
             status: :not_started,
             timer_ref: nil,
             ngram: "",
-            guessed_letters: [],
+            guesses: Map.new(),
             puzzle: []
 
   @type game_code :: String.t()
@@ -28,6 +28,7 @@ defmodule Ngram.GameState do
   @inactivity_timeout 1000 * 60 * 30
 
   @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+  @vowels ~w(a e i o u)
 
   @doc """
   Return an initialized GameState struct. Requires one player to start.
@@ -43,11 +44,18 @@ defmodule Ngram.GameState do
   Guess letter
   """
   def guess_letter(%GameState{} = state, %Player{} = player, letter) do
-    # TODO: Handle case where letter == vowel
-    # TODO: Handle case where letter is already guessed
-    state = %{ state | guessed_letters: [letter | state.guessed_letters] }
+    letter = String.downcase(letter)
+    guess =
+      if letter in @alphabet and letter not in @vowels do
+        %{letter => true}
+      else
+        %{}
+      end
+
+    guesses = Map.merge(state.guesses, guess)
 
     state
+    |> Map.put(:guesses, guesses)
     |> update_puzzle()
     |> verify_player_turn(player)
     |> check_for_done()
@@ -56,7 +64,7 @@ defmodule Ngram.GameState do
   end
 
   def update_puzzle(%GameState{} = state) do
-    hidden_letters = @alphabet -- state.guessed_letters
+    hidden_letters = @alphabet -- Map.keys(state.guesses)
 
     puzzle =
       state.ngram
