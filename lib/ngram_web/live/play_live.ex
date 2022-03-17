@@ -30,17 +30,32 @@ defmodule NgramWeb.PlayLive do
 
   @impl true
   def handle_event("guess", %{"key" => "Enter"}, socket) do
-    case GameServer.guess_letter(
-      socket.assigns.game_code,
-      socket.assigns.player_id,
-      socket.assigns.guess
-    ) do
-      :ok ->
-        # We get the new official game state through a PubSub event
-        {:noreply, socket}
+    if socket.assigns.guess in ~w(a e i o u) do
+      case GameServer.buy_vowel(
+        socket.assigns.game_code,
+        socket.assigns.player_id,
+        socket.assigns.guess
+      ) do
+        :ok ->
+          # We get the new official game state through a PubSub event
+          {:noreply, socket}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, reason)}
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, reason)}
+      end
+    else
+      case GameServer.guess_letter(
+        socket.assigns.game_code,
+        socket.assigns.player_id,
+        socket.assigns.guess
+      ) do
+        :ok ->
+          # We get the new official game state through a PubSub event
+          {:noreply, socket}
+
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, reason)}
+      end
     end
   end
 

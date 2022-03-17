@@ -105,6 +105,10 @@ defmodule Ngram.GameServer do
     GenServer.call(via_tuple(game_code), {:guess_letter, player_id, letter})
   end
 
+  def buy_vowel(game_code, player_id, letter) do
+    GenServer.call(via_tuple(game_code), {:buy_vowel, player_id, letter})
+  end
+
   @doc """
   Perform a move for the player
   """
@@ -168,6 +172,19 @@ defmodule Ngram.GameServer do
   def handle_call({:guess_letter, player_id, letter}, _from, %GameState{} = state) do
     with {:ok, player} <- GameState.find_player(state, player_id),
          {:ok, new_state} <- GameState.guess_letter(state, player, letter) do
+      broadcast_game_state(new_state)
+      {:reply, :ok, new_state}
+    else
+      {:error, reason} = error ->
+        Logger.error("Player guess failed. Error: #{inspect(reason)}")
+        {:reply, error, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:buy_vowel, player_id, letter}, _from, %GameState{} = state) do
+    with {:ok, player} <- GameState.find_player(state, player_id),
+         {:ok, new_state} <- GameState.buy_vowel(state, player, letter) do
       broadcast_game_state(new_state)
       {:reply, :ok, new_state}
     else

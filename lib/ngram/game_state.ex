@@ -65,6 +65,34 @@ defmodule Ngram.GameState do
   Guess letter
   """
   def guess_letter(%GameState{} = state, %Player{} = player, letter) do
+    letter =
+      if letter in @vowels do
+        ""
+      else
+        letter
+      end
+
+    guess(state, player, letter)
+  end
+
+  @doc """
+  Guess letter
+  """
+  def buy_vowel(%GameState{} = state, %Player{} = player, letter) do
+    letter =
+      if letter in @vowels do
+        letter
+      else
+        ""
+      end
+
+    guess(state, player, letter)
+  end
+
+  @doc """
+  Guess letter
+  """
+  def guess(%GameState{} = state, %Player{} = player, letter) do
     letter = String.downcase(letter)
 
     # Set prize_mult to 0 if some guessed this letter
@@ -79,7 +107,7 @@ defmodule Ngram.GameState do
 
     # Add this letter to
     guess =
-      if letter in @alphabet and letter not in @vowels do
+      if letter in @alphabet do
         %{letter => true}
       else
         %{}
