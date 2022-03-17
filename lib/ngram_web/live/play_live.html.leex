@@ -10,12 +10,18 @@
       Tell a friend to use this game code to join you!
     </p>
   <% else %>
-
     <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
-      <%= @game.ngram %>
-    </div>
-    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
-      <%= @game.hint %>
+      <div class="flex flex-wrap justify-center">
+        <%= for word <- @game.puzzle do %>
+          <div class="flex flex-auto mb-4 mr-10">
+            <%= for letter <- word do %>
+              <div class="flex items-center justify-center w-10 h-10 bg-white border border-indego-600 mr-1">
+                <%= letter %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
     <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center" phx-window-keydown="guess">
       Guess: <%= @guess %>

@@ -12,7 +12,7 @@ defmodule Ngram.GameState do
             timer_ref: nil,
             ngram: "",
             guessed_letters: [],
-            hint: ""
+            puzzle: []
 
   @type game_code :: String.t()
 
@@ -36,7 +36,7 @@ defmodule Ngram.GameState do
   def new(game_code, %Player{} = player) do
     %GameState{code: game_code, players: [%Player{player | letter: "O"}], ngram: "a beautiful day in the neighborhood"}
     |> reset_inactivity_timer()
-    |> update_hint()
+    |> update_puzzle()
   end
 
   @doc """
@@ -48,15 +48,22 @@ defmodule Ngram.GameState do
     state = %{ state | guessed_letters: [letter | state.guessed_letters] }
 
     state
-    |> update_hint()
+    |> update_puzzle()
     |> verify_player_turn(player)
     |> check_for_done()
     |> next_player_turn()
     |> reset_inactivity_timer()
   end
 
-  def update_hint(%GameState{} = state) do
-    %{state | hint: String.replace(state.ngram, @alphabet -- state.guessed_letters, "_") }
+  def update_puzzle(%GameState{} = state) do
+    hidden_letters = @alphabet -- state.guessed_letters
+
+    puzzle =
+      state.ngram
+      |> String.split
+      |> Enum.map(&(String.replace(&1, hidden_letters, " ") |> String.split("", trim: true)))
+
+    %{state | puzzle: puzzle }
   end
 
   @doc """
