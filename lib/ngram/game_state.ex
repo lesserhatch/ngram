@@ -67,19 +67,16 @@ defmodule Ngram.GameState do
     {:error, "Can only join a created game"}
   end
 
-  def join_game(%GameState{players: [_p1, _p2]} = _state, %Player{} = _player) do
-    {:error, "Only 2 players allowed"}
+  def join_game(%GameState{players: [_p1, _p2, _p3]} = _state, %Player{} = _player) do
+    {:error, "Only 3 players allowed"}
   end
 
-  def join_game(%GameState{players: [p1]} = state, %Player{} = player) do
-    player =
-      if p1.letter == "O" do
-        %Player{player | letter: "X"}
-      else
-        %Player{player | letter: "O"}
-      end
+  def join_game(%GameState{players: [_p1]} = state, %Player{} = player) do
+    {:ok, %GameState{state | players: [player | state.players]}}
+  end
 
-    {:ok, %GameState{state | players: [p1, player]} |> reset_inactivity_timer()}
+  def join_game(%GameState{} = state, %Player{} = player) do
+    {:ok, %GameState{state | players: [player | state.players]} |> reset_inactivity_timer()}
   end
 
   @doc """
@@ -120,8 +117,10 @@ defmodule Ngram.GameState do
   def start(%GameState{status: :playing}), do: {:error, "Game in play"}
   def start(%GameState{status: :done}), do: {:error, "Game is done"}
 
-  def start(%GameState{status: :not_started, players: [_p1, _p2]} = state) do
-    {:ok, %GameState{state | status: :playing, player_turn: "O"} |> reset_inactivity_timer()}
+  def start(%GameState{status: :not_started, players: [_p1, _p2, _p3]} = state) do
+    first_player = Enum.at(state.players, 0)
+
+    {:ok, %GameState{state | status: :playing, player_turn: first_player.id} |> reset_inactivity_timer()}
   end
 
   def start(%GameState{players: _players}), do: {:error, "Missing players"}
@@ -130,7 +129,7 @@ defmodule Ngram.GameState do
   Return a boolean value for if it is currently the given player's turn.
   """
   @spec player_turn?(t(), Player.t()) :: boolean()
-  def player_turn?(%GameState{player_turn: turn}, %Player{letter: letter}) when turn == letter,
+  def player_turn?(%GameState{player_turn: player_id}, %Player{id: id}) when player_id == id,
     do: true
 
   def player_turn?(%GameState{}, %Player{}), do: false
@@ -151,7 +150,7 @@ defmodule Ngram.GameState do
   draw, or the game is still going.
   """
   @spec result(t()) :: :playing | :draw | Player.t()
-  def result(%GameState{players: [p1, p2]} = state) do
+  def result(%GameState{players: [p1, p2, _p3]} = state) do
     player_1_won =
       case check_for_player_win(state, p1) do
         :not_found -> false
@@ -201,8 +200,12 @@ defmodule Ngram.GameState do
 
   defp next_player_turn({:error, _reason} = error), do: error
 
-  defp next_player_turn({:ok, %GameState{player_turn: turn} = state}) do
-    {:ok, %GameState{state | player_turn: if(turn == "X", do: "O", else: "X")}}
+  defp next_player_turn({:ok, %GameState{player_turn: player_turn} = state}) do
+    # Find current index, increment it, the mod with the players length
+    next_index = (1 + Enum.find_index(state.players, &(&1.id == player_turn)))
+    next_index = rem(next_index, length(state.players))
+    next_player = Enum.at(state.players, next_index)
+    {:ok, %GameState{state | player_turn: next_player.id}}
   end
 
   defp reset_inactivity_timer({:error, _reason} = error), do: error

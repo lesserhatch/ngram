@@ -143,10 +143,15 @@ defmodule Ngram.GameServer do
 
   @impl true
   def handle_call({:join_game, %Player{} = player}, _from, %GameState{} = state) do
-    with {:ok, new_state} <- GameState.join_game(state, player),
-         {:ok, started} <- GameState.start(new_state) do
-      broadcast_game_state(started)
-      {:reply, :ok, started}
+    with {:ok, new_state} <- GameState.join_game(state, player) do
+      case GameState.start(new_state) do
+        {:ok, started} ->
+          broadcast_game_state(started)
+          {:reply, :ok, started}
+
+        _ ->
+          {:reply, :ok, new_state}
+      end
     else
       {:error, reason} = error ->
         Logger.error("Failed to join and start game. Error: #{inspect(reason)}")
