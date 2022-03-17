@@ -13,7 +13,8 @@ defmodule Ngram.GameState do
             ngram: "",
             guesses: Map.new(),
             puzzle: [],
-            prize_mult: 1
+            prize_mult: 1,
+            winnings: Map.new()
 
   @type game_code :: String.t()
 
@@ -42,11 +43,22 @@ defmodule Ngram.GameState do
     |> random_prize_mult()
   end
 
-  @doc """
-  Random prize multiplier
-  """
-  def random_prize_mult(%GameState{} = state) do
-    %{state | prize_mult: Enum.random(1..12) * 100}
+  defp random_prize_mult({:error, _reason} = error), do: error
+  defp random_prize_mult({:ok, %GameState{} = state}), do: {:ok, random_prize_mult(state)}
+  defp random_prize_mult(%GameState{} = state), do: %{state | prize_mult: Enum.random(1..12) * 100}
+
+  defp update_winnings({:error, _reason} = error, %Player{} = _player, _letter), do: error
+  defp update_winnings({:ok, %GameState{} = state}, %Player{} = player, letter) do
+    letter_count = state.ngram |> String.graphemes |> Enum.count(& &1 == letter)
+    round_winnings = letter_count * state.prize_mult
+
+    winnings =
+      state.winnings
+      |> Map.update(player.id, round_winnings, &(&1 + round_winnings))
+
+    new_state = %{state | winnings: winnings}
+
+    {:ok, new_state}
   end
 
   @doc """
@@ -54,6 +66,18 @@ defmodule Ngram.GameState do
   """
   def guess_letter(%GameState{} = state, %Player{} = player, letter) do
     letter = String.downcase(letter)
+
+    # Set prize_mult to 0 if some guessed this letter
+    # already. This prevents double scoring of letters.
+    # Also set prize_mult to 0 if the letter is a vowel.
+    prize_mult =
+      cond do
+        Map.has_key?(state.guesses, letter) -> 0
+        letter in @vowels -> 0
+        true -> state.prize_mult
+      end
+
+    # Add this letter to
     guess =
       if letter in @alphabet and letter not in @vowels do
         %{letter => true}
@@ -65,9 +89,11 @@ defmodule Ngram.GameState do
 
     state
     |> Map.put(:guesses, guesses)
+    |> Map.put(:prize_mult, prize_mult)
     |> update_puzzle()
-    |> random_prize_mult()
     |> verify_player_turn(player)
+    |> update_winnings(player, letter)
+    |> random_prize_mult()
     |> check_for_done()
     |> next_player_turn()
     |> reset_inactivity_timer()

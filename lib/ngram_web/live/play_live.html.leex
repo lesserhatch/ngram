@@ -42,13 +42,13 @@
 
     <%= if @player do %>
       <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
-        Player: <span class="font-semibold"><%= @player.name %></span>
+        Player: <span class="font-semibold"><%= @player.name %></span> - <%= Map.get(@game.winnings, @player.id, 0) %>
       </div>
 
       <%= for player <- @game.players do %>
         <%= if player.id != @player.id do %>
           <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
-            Opponent: <span class="font-semibold"><%= player.name %></span>
+            Opponent: <span class="font-semibold"><%= player.name %></span> - <%= Map.get(@game.winnings, player.id, 0) %>
           </div>
         <% end %>
       <% end %>
