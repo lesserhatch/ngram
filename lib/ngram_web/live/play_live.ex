@@ -46,7 +46,11 @@ defmodule NgramWeb.PlayLive do
 
   @impl true
   def handle_event("guess", %{"key" => key}, socket) do
-    {:noreply, assign(socket, guess: key)}
+    if String.match?(key, ~r/^[[:alpha:]]$/) do
+      {:noreply, assign(socket, guess: String.downcase(key))}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
