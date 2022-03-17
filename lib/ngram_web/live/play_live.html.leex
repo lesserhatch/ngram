@@ -23,6 +23,11 @@
         <% end %>
       </div>
     </div>
+
+    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
+      Guesses: <%= Map.keys(@game.guesses) |> Enum.join(", ") %>
+    </div>
+
     <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center" phx-window-keydown="guess">
       <%= if @guess in ~w(a e i o u) do %>
         Buy Vowel: <%= @guess %>
