@@ -107,6 +107,9 @@ defmodule Ngram.GameStateTest do
 
       state = %GameState{status: :not_started, players: [p1]}
       assert {:error, "Missing players"} == GameState.start(state)
+
+      state = %GameState{status: :not_started, players: [p1, p2]}
+      assert {:error, "Missing players"} == GameState.start(state)
     end
 
     test "can't start when done", %{players: players} do
