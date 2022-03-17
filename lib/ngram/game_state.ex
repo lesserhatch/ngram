@@ -12,7 +12,8 @@ defmodule Ngram.GameState do
             timer_ref: nil,
             ngram: "",
             guesses: Map.new(),
-            puzzle: []
+            puzzle: [],
+            prize_mult: 1
 
   @type game_code :: String.t()
 
@@ -38,6 +39,14 @@ defmodule Ngram.GameState do
     %GameState{code: game_code, players: [%Player{player | letter: "O"}], ngram: "a beautiful day in the neighborhood"}
     |> reset_inactivity_timer()
     |> update_puzzle()
+    |> random_prize_mult()
+  end
+
+  @doc """
+  Random prize multiplier
+  """
+  def random_prize_mult(%GameState{} = state) do
+    %{state | prize_mult: Enum.random(1..12) * 100}
   end
 
   @doc """
@@ -57,6 +66,7 @@ defmodule Ngram.GameState do
     state
     |> Map.put(:guesses, guesses)
     |> update_puzzle()
+    |> random_prize_mult()
     |> verify_player_turn(player)
     |> check_for_done()
     |> next_player_turn()

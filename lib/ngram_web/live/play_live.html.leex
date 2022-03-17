@@ -25,6 +25,10 @@
     </div>
 
     <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
+      Prize Mult: <%= @game.prize_mult %>
+    </div>
+
+    <div class="mb-4 text-lg leading-6 font-medium text-gray-900 text-center">
       Guesses: <%= Map.keys(@game.guesses) |> Enum.join(", ") %>
     </div>
 
