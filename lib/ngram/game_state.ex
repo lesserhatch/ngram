@@ -47,18 +47,29 @@ defmodule Ngram.GameState do
   defp random_prize_mult({:ok, %GameState{} = state}), do: {:ok, random_prize_mult(state)}
   defp random_prize_mult(%GameState{} = state), do: %{state | prize_mult: Enum.random(1..12) * 100}
 
-  defp update_winnings({:error, _reason} = error, %Player{} = _player, _letter), do: error
-  defp update_winnings({:ok, %GameState{} = state}, %Player{} = player, letter) do
-    letter_count = state.ngram |> String.graphemes |> Enum.count(& &1 == letter)
-    round_winnings = letter_count * state.prize_mult
+  defp calculate_guess_score(%GameState{} = state, letter) do
+    if letter in @vowels do
+      0
+    else
+      letter_count = state.ngram |> String.graphemes |> Enum.count(& &1 == letter)
+      letter_count * state.prize_mult
+    end
+  end
 
-    winnings =
-      state.winnings
-      |> Map.update(player.id, round_winnings, &(&1 + round_winnings))
+  defp update_winnings({:error, _reason} = error, %Player{} = _player, _amount), do: error
+  defp update_winnings({:ok, %GameState{} = state}, %Player{} = player, amount) do
+    update_winnings(state, player, amount)
+  end
 
-    new_state = %{state | winnings: winnings}
+  defp update_winnings(%GameState{} = state, %Player{} = player, amount) do
+    winnings = state.winnings |> Map.update(player.id, amount, &(&1 + amount))
+    new_winnings_amount = winnings |> Map.get(player.id)
 
-    {:ok, new_state}
+    if new_winnings_amount >= 0 do
+      {:ok, %{state | winnings: winnings}}
+    else
+      {:error, "Insufficient balance"}
+    end
   end
 
   @doc """
@@ -86,12 +97,17 @@ defmodule Ngram.GameState do
         ""
       end
 
-    guess(state, player, letter)
+    state
+    |> update_winnings(player, -250)
+    |> guess(player, letter)
   end
 
   @doc """
   Guess letter
   """
+  def guess({:error, _reason} = error, _player, _letter), do: error
+  def guess({:ok, %GameState{} = state}, %Player{} = player, letter), do: guess(state, player, letter)
+
   def guess(%GameState{} = state, %Player{} = player, letter) do
     letter = String.downcase(letter)
 
@@ -114,13 +130,14 @@ defmodule Ngram.GameState do
       end
 
     guesses = Map.merge(state.guesses, guess)
+    guess_score = calculate_guess_score(state, letter)
 
     state
     |> Map.put(:guesses, guesses)
     |> Map.put(:prize_mult, prize_mult)
     |> update_puzzle()
     |> verify_player_turn(player)
-    |> update_winnings(player, letter)
+    |> update_winnings(player, guess_score)
     |> random_prize_mult()
     |> check_for_done()
     |> next_player_turn()
