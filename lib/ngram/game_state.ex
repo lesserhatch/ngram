@@ -14,7 +14,8 @@ defmodule Ngram.GameState do
             guesses: Map.new(),
             puzzle: [],
             prize_mult: 1,
-            winnings: Map.new()
+            winnings: Map.new(),
+            winner_id: nil
 
   @type game_code :: String.t()
 
@@ -138,9 +139,9 @@ defmodule Ngram.GameState do
     |> update_puzzle()
     |> verify_player_turn(player)
     |> update_winnings(player, guess_score)
-    |> random_prize_mult()
     |> check_for_done()
     |> next_player_turn()
+    |> random_prize_mult()
     |> reset_inactivity_timer()
   end
 
@@ -231,42 +232,6 @@ defmodule Ngram.GameState do
   def player_turn?(%GameState{}, %Player{}), do: false
 
   @doc """
-  Check to see if the player won. Return a tuple of the winning squares if the they won. If no win found, returns `:not_found`.
-
-  Tests for all the different ways the player could win.
-  """
-  @spec check_for_player_win(t(), Player.t()) :: :not_found | [atom()]
-  def check_for_player_win(%GameState{} = _state, %Player{letter: _letter}) do
-    # TODO: define player win logic
-    :not_found
-  end
-
-  @doc """
-  Check for who the game's result. Either a player won, the game ended in a
-  draw, or the game is still going.
-  """
-  @spec result(t()) :: :playing | :draw | Player.t()
-  def result(%GameState{players: [p1, p2, _p3]} = state) do
-    player_1_won =
-      case check_for_player_win(state, p1) do
-        :not_found -> false
-        [_, _, _] -> true
-      end
-
-    player_2_won =
-      case check_for_player_win(state, p2) do
-        :not_found -> false
-        [_, _, _] -> true
-      end
-
-    cond do
-      player_1_won -> p1
-      player_2_won -> p2
-      true -> :playing
-    end
-  end
-
-  @doc """
   Restart the game resetting the state back.
   """
   def restart(%GameState{players: [p1 | _]} = state) do
@@ -282,14 +247,33 @@ defmodule Ngram.GameState do
     end
   end
 
-  defp check_for_done({:ok, %GameState{} = state}) do
-    case result(state) do
-      :playing ->
-        {:ok, state}
+  defp get_remaining_letters(%GameState{} = state) do
+    ngram_letters =
+      state.ngram
+      |> String.split("", trim: true)
+      |> Enum.uniq()
+      |> Enum.filter(&(&1 != " "))
 
-      _game_done ->
-        {:ok, %GameState{state | status: :done}}
-    end
+    guesses =
+      state.guesses
+      |> Map.keys()
+
+    ngram_letters -- guesses
+  end
+
+  defp check_for_done({:ok, %GameState{} = state}) do
+    state =
+      case get_remaining_letters(state) do
+        [] ->
+          state
+          |> Map.put(:status, :done)
+          |> Map.put(:winner_id, state.player_turn)
+
+        _ ->
+          state
+      end
+
+    {:ok, state}
   end
 
   defp check_for_done({:error, _reason} = error), do: error

@@ -37,18 +37,11 @@ defmodule NgramWeb.LiveView.Components do
   end
 
   def result(%GameState{status: :done} = state) do
-    text =
-      case GameState.result(state) do
-        :draw ->
-          "Tie Game!"
-
-        %Player{name: winner_name} ->
-          "#{winner_name} Wins!"
-      end
+    player = state.players |> Enum.find(%Player{}, &(&1.id == state.winner_id))
 
     ~E"""
     <div class="m-4 sm:m-8 text-3xl sm:text-6xl text-center text-green-700">
-      <%= text %>
+      Winner: <%= player.name %>
     </div>
     """
   end
